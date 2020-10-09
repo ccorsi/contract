@@ -51,7 +51,7 @@ that parameter c.  While the parameter d does not required any contract requirem
 The following table contains the different options that the can be used with this decorator.
 
 | Name | Parameters | Type | Description |
-|---|---|---|
+|---|---|---|---|
 | validvalues | tuple | Value Check | Checks that the parameter value is part of the tuple |
 | checktype | type | Type Check | Checks if the parameter is an instance of the expected type |
 | closed | a,b such that a <= b | Closed Range Check | Checks if the value is between two values including a and b |
