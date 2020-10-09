@@ -62,7 +62,6 @@ The following table contains the different options that the can be used with thi
 | lt | a | Value Check | Checks that the parameter value is less than a |
 | gteq | a | Value Check | Checks that the parameter value is greater than or equal to a | 
 | lteq | a | Value Check | Checks that the parameter value is less than or equal to a |
-| --- | --- | --- |
 
 ## Examples
 
