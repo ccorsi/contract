@@ -50,19 +50,19 @@ that parameter c.  While the parameter d does not required any contract requirem
 
 The following table contains the different options that the can be used with this decorator.
 
-Name | Parameters | Type | Description 
---- | --- | ---
-validvalues | tuple | Value Check | Checks that the parameter value is part of the tuple 
-checktype | type | Type Check | Checks if the parameter is an instance of the expected type 
-closed | a,b such that a <= b | Closed Range Check | Checks if the value is between two values including a and b 
-opened | a,b such that a < b | Opened Range Check | Checks if the value is between two values excluding a and b 
-closedopened | a,b such that a < b | Closed/Opened Check | Checks if the value is between two values including a 
-openedclosed | a,b such that a < b | Opened/Closed Check | Checks if the value is between two values including b 
-gt | a | Value Check | Checks that the parameter value is greater than a 
-lt | a | Value Check | Checks that the parameter value is less than a 
-gteq | a | Value Check | Checks that the parameter value is greater than or equal to a 
-lteq | a | Value Check | Checks that the parameter value is less than or equal to a 
---- | --- | --- 
+| Name | Parameters | Type | Description |
+|---|---|---|
+| validvalues | tuple | Value Check | Checks that the parameter value is part of the tuple |
+| checktype | type | Type Check | Checks if the parameter is an instance of the expected type |
+| closed | a,b such that a <= b | Closed Range Check | Checks if the value is between two values including a and b |
+| opened | a,b such that a < b | Opened Range Check | Checks if the value is between two values excluding a and b |
+| closedopened | a,b such that a < b | Closed/Opened Check | Checks if the value is between two values including a |
+| openedclosed | a,b such that a < b | Opened/Closed Check | Checks if the value is between two values including b | 
+| gt | a | Value Check | Checks that the parameter value is greater than a | 
+| lt | a | Value Check | Checks that the parameter value is less than a |
+| gteq | a | Value Check | Checks that the parameter value is greater than or equal to a | 
+| lteq | a | Value Check | Checks that the parameter value is less than or equal to a |
+| --- | --- | --- |
 
 ## Examples
 
