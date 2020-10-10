@@ -15,7 +15,8 @@
 
 """
 
-__all__ = ["contract", "validvalues", "checktype", "closed", "opened", "closedopened", "openedclosed", "gt", "lt", "gteq", "lteq"]
+__all__ = ["contract", "validvalues", "checktype", "closed", "opened", "closedopened", "openedclosed", "gt", "lt",
+           "gteq", "lteq"]
 
 """
 NOTE: This code was inspired by the following sources:
@@ -38,6 +39,7 @@ import inspect
 class BaseCheck:
     pass
 
+
 # Checks that the value is an instance of type t
 class CheckType(BaseCheck):
     def __init__(self, t):
@@ -57,6 +59,7 @@ class CheckClosedRange(BaseCheck):
         assert self._a <= v, 'Incorrect value {} has to be greater than or equal to {}'.format(v, self._a)
         assert self._b >= v, 'Incorrect value {} has to be less than or equal to {}'.format(v, self._b)
 
+
 # (a,b)
 class CheckOpenedRange(BaseCheck):
     def __init__(self, a, b):
@@ -66,6 +69,7 @@ class CheckOpenedRange(BaseCheck):
     def __call__(self, v):
         assert self._a < v, 'Incorrect value {} has to be greater than {}'.format(v, self._a)
         assert self._b > v, 'Incorrect value {} has to be less than {}'.format(v, self._b)
+
 
 # (a,b]
 class CheckOpenedClosedRange(BaseCheck):
@@ -77,6 +81,7 @@ class CheckOpenedClosedRange(BaseCheck):
         assert self._a < v, 'Incorrect value {} has to be greater than {}'.format(v, self._a)
         assert self._b >= v, 'Incorrect value {} has to be less than or equal to {}'.format(v, self._b)
 
+
 # [a.b)
 class CheckClosedOpenedRange(BaseCheck):
     def __init__(self, a, b):
@@ -87,6 +92,7 @@ class CheckClosedOpenedRange(BaseCheck):
         assert self._a <= v, 'Incorrect value {} has to be greater than {}'.format(v, self._a)
         assert self._b > v, 'Incorrect value {} has to be less than {}'.format(v, self._b)
 
+
 # < a
 class LessThan(BaseCheck):
     def __init__(self, a):
@@ -94,6 +100,7 @@ class LessThan(BaseCheck):
 
     def __call__(self, v):
         assert v < self._a, 'Invalid value {} should be less than {}'.format(v, self._a)
+
 
 # > a
 class GreaterThan(BaseCheck):
@@ -103,6 +110,7 @@ class GreaterThan(BaseCheck):
     def __call__(self, v):
         assert v > self._a, 'Invalid value {} should be greater than {}'.format(v, self._a)
 
+
 # <= a
 class LessThanOrEqual(BaseCheck):
     def __init__(self, a):
@@ -111,6 +119,7 @@ class LessThanOrEqual(BaseCheck):
     def __call__(self, v):
         assert v <= self._a, 'Invalid value {} should be less than or equal {}'.format(v, self._a)
 
+
 # >= a
 class GreaterThanOrEqual(BaseCheck):
     def __init__(self, a):
@@ -118,6 +127,7 @@ class GreaterThanOrEqual(BaseCheck):
 
     def __call__(self, v):
         assert v >= self._a, 'Invalid value {} should be greater than or equal {}'.format(v, self._a)
+
 
 # Checks that the value passed is contained within the expected values.
 # The passed expected value has to be a tuple such that the 'in' command
@@ -129,41 +139,63 @@ class ValidateValues(BaseCheck):
     def __call__(self, v):
         assert v in self._values, 'Invalid value {} should be one of {}'.format(v, self._values)
 
+
 def validvalues(values):
     return ValidateValues(values)
+
 
 def checktype(t):
     return CheckType(t)
 
+
 def closed(a, b):
     return CheckClosedRange(a, b)
+
 
 def opened(a, b):
     return CheckOpenedRange(a, b)
 
+
 def closedopened(a, b):
     return CheckClosedOpenedRange(a, b)
+
 
 def openedclosed(a, b):
     return CheckOpenedClosedRange(a, b)
 
+
 def gt(a):
     return GreaterThan(a)
+
 
 def lt(a):
     return LessThan(a)
 
+
 def gteq(a):
     return GreaterThanOrEqual(a)
+
 
 def lteq(a):
     return LessThanOrEqual(a)
 
+
 def _assigngetargsspec():
+    """
+    This method will determine which method should be used to extract the method information.
+    The reason behind this call is that the getfullargspec method was not introduced within
+    the initial release of python 3.0.  Thus, we are determining which method should be used.
+    We are then boxing in this check within this code which will make the code calling this
+    cleaner.
+
+    :return:  The method that can be used to extract parameter information for a given
+        method.
+    """
     if (hasattr(inspect, 'getfullargspec')):
         return inspect.getfullargspec
     else:
         return inspect.getargspec
+
 
 getargsspec = _assigngetargsspec()
 
@@ -190,6 +222,7 @@ class CheckFunction(object):
             for idx, name in enumerate(sig.parameters):
                 self._signs[name] = idx
         except Exception as ex:
+            # TBD: Should we be raising this exception or just leave it alone?
             print('an exception was raised when getting the function signature', ex)
 
     def __call__(self, *args, **kwargs):
@@ -204,8 +237,14 @@ class CheckFunction(object):
         # Process each parameter value and apply the checks
         # to each parameter that has one or more defined.
         for idx, value in enumerate(args):
+            # Determine if the current parameter has an associated contract check that needs to be applied.
             if (fargsspec.args[idx] in self._checks):
-                assert hasattr(self._checks[fargsspec.args[idx]],"__iter__"), "Invalid type {}, it should be a tuple type for parameter: {}".format(type(self._checks[fargsspec.args[idx]]), fargsspec.args[idx])
+                # Check that the passed set of checks are contained within a iterable type object
+                # by looking for the __iter__ method.
+                assert hasattr(self._checks[fargsspec.args[idx]], "__iter__"), \
+                    "Invalid type {}, it should be a tuple type for parameter: {}".format(
+                        type(self._checks[fargsspec.args[idx]]), fargsspec.args[idx])
+                # Iterate through each contract check and call it passing the current parameter value
                 for check in self._checks[fargsspec.args[idx]]:
                     check(value)
         # Process each of the passed dictionary name/value pairs
@@ -214,6 +253,9 @@ class CheckFunction(object):
                 for check in self._checks[name]:
                     check(value)
 
+        # Call the method and forward the parameter values while storing the
+        # return value that can then be checked prior to return by the
+        # called method.
         returnValue = self._func(*args, **kwargs)
 
         # Determine if the returned value abides to the required
@@ -226,25 +268,29 @@ class CheckFunction(object):
 
 class contract(object):
     """
-  Contract Decorator
+  Contract Decorator:
+    This decorator can be used to associate method specific conditions that have to been maintained during
+    runtime.  This will allow the developer to move the parameter contract to be checked outside of the
+    calling method.  This provides for a cleaner method without the added parameter checking.  This
+    decorator also provides the ability to check the returning valuing.  Thus not limiting this check
+    to only the passing parameter values.
   """
 
     def __init__(self, conditions):
         # Check that the passed checks is a dictionary
         assert isinstance(conditions, dict), "Invalid type {} for parameter checks, supposed to be a dict".format(
-                type(conditions))
+            type(conditions))
         # Check that each value is an iterable tuple
         for key, value in conditions.items():
-            assert hasattr(value, "__iter__"), "Invalid type {} for key {}, supposed to be an iterable instance".format(type(value),key)
+            assert hasattr(value, "__iter__"), "Invalid type {} for key {}, supposed to be an iterable instance".format(
+                type(value), key)
 
         self._checks = conditions
 
     def __call__(self, f):
         # Initialize the instance that will perform the checks
-        # check = CheckFunction(f,self._checks)
         def check(*args, **kwargs):
             conditions = CheckFunction(f, self._checks)
             return conditions(*args, **kwargs)
-            # return f(*args,**kwargs)
 
         return check

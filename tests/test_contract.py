@@ -121,6 +121,14 @@ class InvalidContractTestCase(TestCase):
     def test_non_existent_parameter_name(self):
         non_existent_parameter_name(101)
 
+    def test_invalid_type(self):
+        with self.assertRaises(AssertionError):
+            @contract({'a':[checktype(int), lt(5)]})
+            def not_valid_type_call(a):
+                pass
+
+            not_valid_type_call(1.34)
+
 class DecoratorOptionTestCase(TestCase):
     """
     This test will just test that the different decorator options
