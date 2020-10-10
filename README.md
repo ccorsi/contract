@@ -110,7 +110,7 @@ The above will then perform the expected checks for each of the parameters.
 Note that the above checks are not restricted to the primitive values but can be 
 any class that implements the different range checks methods of the Data Model. 
 You can then use the Range checks with a users defined class that implements 
-the __lt__, __le__, __gt__, and __ge__ methods.
+the \_\_lt\_\_, \_\_le\_\_, \_\_gt\_\_, and \_\_ge\_\_ methods.
   
 ### Tuple Check
 
