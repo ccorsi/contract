@@ -5,9 +5,9 @@ methods and classes.
 
 This decorator would not be possible without the inspiration of the following:
 
-    - [So you want to be a Python expert? by James Powell](https://www.youtube.com/watch?v=cKPlPJyQrt4)
-    - [Pre/Post-Condition Decorator Example](https://wiki.python.org/moin/PythonDecoratorLibrary#Pre-.2FPost-Conditions)
-    - [Andrew P accepts decorator](https://github.com/andrewp-as-is/accepts.py)
+* [So you want to be a Python expert? by James Powell](https://www.youtube.com/watch?v=cKPlPJyQrt4)
+* [Pre/Post-Condition Decorator Example](https://wiki.python.org/moin/PythonDecoratorLibrary#Pre-.2FPost-Conditions)
+* [Andrew P accepts decorator](https://github.com/andrewp-as-is/accepts.py)
 
 The above inspired me to create this decorator to reduce the clutter of my code. 
 
