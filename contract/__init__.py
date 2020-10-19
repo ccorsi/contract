@@ -36,7 +36,7 @@ import inspect
 
 
 # Used to determine if the passed conditions are valid types
-class BaseCheck:
+class BaseCheck(object):
     pass
 
 
@@ -284,6 +284,11 @@ class contract(object):
         for key, value in conditions.items():
             assert hasattr(value, "__iter__"), "Invalid type {} for key {}, supposed to be an iterable instance".format(
                 type(value), key)
+            for check in value:
+                assert isinstance(check, BaseCheck), "Invalid check class type {}, supposed to extend BaseCheck".format(
+                    type(check))
+                assert hasattr(check,
+                               "__call__"), "Invalid type {}, supposed to be a callable instance".format(type(check))
 
         self._checks = conditions
 

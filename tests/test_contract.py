@@ -1,7 +1,8 @@
 import unittest
 
-from contract import contract, gt, validvalues, gteq, lt, lteq, closed, opened, closedopened, openedclosed, checktype
+from contract import contract, gt, validvalues, gteq, lt, lteq, closed, opened, closedopened, openedclosed, checktype, BaseCheck
 from unittest import TestCase, TestSuite, main
+
 
 class Simple(object):
     @contract({})
@@ -31,6 +32,7 @@ class Simple(object):
 def m(a, b):
     pass
 
+
 class ContractTestCase(TestCase):
 
     def test_method_check(self):
@@ -59,56 +61,60 @@ class ContractTestCase(TestCase):
         s = Simple()
         s.t(9, 10)
 
-colors = ['blue','red','yellow','green']
+
+colors = ['blue', 'red', 'yellow', 'green']
+
 
 class ValidateObject(object):
 
     def __init__(self):
         pass
 
-    @contract({'c':[validvalues(colors)]})
-    def get_color(self,c):
+    @contract({'c': [validvalues(colors)]})
+    def get_color(self, c):
         pass
 
-    @contract({'a':[gt(1)]})
-    def check_gt(self,a):
+    @contract({'a': [gt(1)]})
+    def check_gt(self, a):
         pass
 
-    @contract({'a':[gteq(1)]})
-    def check_gteq(self,a):
+    @contract({'a': [gteq(1)]})
+    def check_gteq(self, a):
         pass
 
-    @contract({'a':[lt(1)]})
-    def check_lt(self,a):
+    @contract({'a': [lt(1)]})
+    def check_lt(self, a):
         pass
 
-    @contract({'a':[lteq(1)]})
-    def check_lteq(self,a):
+    @contract({'a': [lteq(1)]})
+    def check_lteq(self, a):
         pass
 
-    @contract({'a':[checktype(int)]})
-    def check_checktype(self,a):
+    @contract({'a': [checktype(int)]})
+    def check_checktype(self, a):
         pass
 
-    @contract({'a':[closed(1,3)]})
-    def check_closed(self,a):
+    @contract({'a': [closed(1, 3)]})
+    def check_closed(self, a):
         pass
 
-    @contract({'a':[opened(1,3)]})
-    def check_opened(self,a):
+    @contract({'a': [opened(1, 3)]})
+    def check_opened(self, a):
         pass
 
-    @contract({'a':[closedopened(1,3)]})
-    def check_closedopened(self,a):
+    @contract({'a': [closedopened(1, 3)]})
+    def check_closedopened(self, a):
         pass
 
-    @contract({'a':[openedclosed(1,3)]})
-    def check_openedclosed(self,a):
+    @contract({'a': [openedclosed(1, 3)]})
+    def check_openedclosed(self, a):
         pass
 
-@contract({'b':[checktype(int)]})
+
+@contract({'b': [checktype(int)]})
 def non_existent_parameter_name(a):
     pass
+
 
 class InvalidContractTestCase(TestCase):
 
@@ -123,11 +129,24 @@ class InvalidContractTestCase(TestCase):
 
     def test_invalid_type(self):
         with self.assertRaises(AssertionError):
-            @contract({'a':[checktype(int), lt(5)]})
+            @contract({'a': [checktype(int), lt(5)]})
             def not_valid_type_call(a):
                 pass
 
             not_valid_type_call(1.34)
+
+    def test_invalid_BaseCheck_subclass(self):
+        with self.assertRaises(AssertionError):
+            class InvalidSubClass(BaseCheck):
+                pass
+
+            class Bad(object):
+                @contract({'a':[InvalidSubClass()]})
+                def __init__(self,a):
+                    pass
+
+            bad = Bad()
+
 
 class DecoratorOptionTestCase(TestCase):
     """
@@ -147,6 +166,7 @@ class DecoratorOptionTestCase(TestCase):
         - gteq
         - lteq
     """
+
     def setUp(self):
         self.v = ValidateObject()
 
@@ -188,6 +208,7 @@ class DecoratorOptionTestCase(TestCase):
         with self.assertRaises(AssertionError):
             self.v.check_lteq(5)
 
+
 def load_tests(loader, tests, pattern):
     """
     The unittest module looks for this method within a module
@@ -195,12 +216,13 @@ def load_tests(loader, tests, pattern):
     We just need to insure that we set the module name to this
     file module name.
     """
-    test_classes = [ ContractTestCase, DecoratorOptionTestCase, InvalidContractTestCase ]
+    test_classes = [ContractTestCase, DecoratorOptionTestCase, InvalidContractTestCase]
 
     suite = TestSuite()
     for test_class in test_classes:
         suite.addTests(loader.loadTestsFromTestCase(test_class))
     return suite
+
 
 if (__name__ == '__main__'):
     unittest.main(module=__name__, exit=False)
