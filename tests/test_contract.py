@@ -1,6 +1,6 @@
 import unittest
 
-from contract import contract, gt, validvalues, gteq, lt, lteq, closed, opened, closedopened, openedclosed, checktype, BaseCheck
+from contract import contract, gt, validvalues, gteq, lt, lteq, closed, opened, closedopened, openedclosed, checktype
 from unittest import TestCase, TestSuite, main
 
 
@@ -135,14 +135,14 @@ class InvalidContractTestCase(TestCase):
 
             not_valid_type_call(1.34)
 
-    def test_invalid_BaseCheck_subclass(self):
+    def test_invalid_check_class(self):
         with self.assertRaises(AssertionError):
-            class InvalidSubClass(BaseCheck):
+            class InvalidSubClass(object):
                 pass
 
             class Bad(object):
-                @contract({'a':[InvalidSubClass()]})
-                def __init__(self,a):
+                @contract({'a': [InvalidSubClass()]})
+                def __init__(self, a):
                     pass
 
             bad = Bad()
@@ -165,6 +165,11 @@ class DecoratorOptionTestCase(TestCase):
         - lt
         - gteq
         - lteq
+
+    It also tests the ability of a user define class or method
+    to be used that goes beyond the current available set of
+    checks.
+
     """
 
     def setUp(self):
@@ -208,6 +213,28 @@ class DecoratorOptionTestCase(TestCase):
         with self.assertRaises(AssertionError):
             self.v.check_lteq(5)
 
+    def test_user_defined_check_method(self):
+        def check(v):
+            pass
+
+        @contract({'a':[check]})
+        def foo(a):
+            pass
+
+        foo(101)
+
+    def test_user_defined_callable_class(self):
+        class Foo(object):
+            def __call__(self,v):
+                pass
+
+        class FooClass(object):
+            @contract({'a':[Foo()]})
+            def callMe(self, a):
+                pass
+
+        foo = FooClass()
+        foo.callMe(101)
 
 def load_tests(loader, tests, pattern):
     """

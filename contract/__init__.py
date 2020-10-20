@@ -18,6 +18,9 @@
 __all__ = ["contract", "validvalues", "checktype", "closed", "opened", "closedopened", "openedclosed", "gt", "lt",
            "gteq", "lteq"]
 
+__version__ = '2020.10.20'
+__author__ = 'Claudio Corsi'
+
 """
 NOTE: This code was inspired by the following sources:
 
@@ -35,13 +38,8 @@ adding some complexity to the decorator.
 import inspect
 
 
-# Used to determine if the passed conditions are valid types
-class BaseCheck(object):
-    pass
-
-
 # Checks that the value is an instance of type t
-class CheckType(BaseCheck):
+class CheckType(object):
     def __init__(self, t):
         self._t = t
 
@@ -50,7 +48,7 @@ class CheckType(BaseCheck):
 
 
 # [a,b]
-class CheckClosedRange(BaseCheck):
+class CheckClosedRange(object):
     def __init__(self, a, b):
         self._a = a
         self._b = b
@@ -61,7 +59,7 @@ class CheckClosedRange(BaseCheck):
 
 
 # (a,b)
-class CheckOpenedRange(BaseCheck):
+class CheckOpenedRange(object):
     def __init__(self, a, b):
         self._a = a
         self._b = b
@@ -72,7 +70,7 @@ class CheckOpenedRange(BaseCheck):
 
 
 # (a,b]
-class CheckOpenedClosedRange(BaseCheck):
+class CheckOpenedClosedRange(object):
     def __init__(self, a, b):
         self._a = a
         self._b = b
@@ -83,7 +81,7 @@ class CheckOpenedClosedRange(BaseCheck):
 
 
 # [a.b)
-class CheckClosedOpenedRange(BaseCheck):
+class CheckClosedOpenedRange(object):
     def __init__(self, a, b):
         self._a = a
         self._b = b
@@ -94,7 +92,7 @@ class CheckClosedOpenedRange(BaseCheck):
 
 
 # < a
-class LessThan(BaseCheck):
+class LessThan(object):
     def __init__(self, a):
         self._a = a
 
@@ -103,7 +101,7 @@ class LessThan(BaseCheck):
 
 
 # > a
-class GreaterThan(BaseCheck):
+class GreaterThan(object):
     def __init__(self, a):
         self._a = a
 
@@ -112,7 +110,7 @@ class GreaterThan(BaseCheck):
 
 
 # <= a
-class LessThanOrEqual(BaseCheck):
+class LessThanOrEqual(object):
     def __init__(self, a):
         self._a = a
 
@@ -121,7 +119,7 @@ class LessThanOrEqual(BaseCheck):
 
 
 # >= a
-class GreaterThanOrEqual(BaseCheck):
+class GreaterThanOrEqual(object):
     def __init__(self, a):
         self._a = a
 
@@ -132,7 +130,7 @@ class GreaterThanOrEqual(BaseCheck):
 # Checks that the value passed is contained within the expected values.
 # The passed expected value has to be a tuple such that the 'in' command
 # is defined as the passed expected value tuple.
-class ValidateValues(BaseCheck):
+class ValidateValues(object):
     def __init__(self, values):
         self._values = values
 
@@ -254,7 +252,7 @@ class CheckFunction(object):
                     check(value)
 
         # Call the method and forward the parameter values while storing the
-        # return value that can then be checked prior to return by the
+        # return value that can then be checked prior to returning from the
         # called method.
         returnValue = self._func(*args, **kwargs)
 
@@ -285,10 +283,11 @@ class contract(object):
             assert hasattr(value, "__iter__"), "Invalid type {} for key {}, supposed to be an iterable instance".format(
                 type(value), key)
             for check in value:
-                assert isinstance(check, BaseCheck), "Invalid check class type {}, supposed to extend BaseCheck".format(
-                    type(check))
-                assert hasattr(check,
-                               "__call__"), "Invalid type {}, supposed to be a callable instance".format(type(check))
+                # Determine if we are passed a class instance
+                if inspect.isclass(type(check)):
+                    # Insure that the class instance has a callable method
+                    assert hasattr(check,
+                                   "__call__"), "Invalid type {}, supposed to be a callable instance".format(type(check))
 
         self._checks = conditions
 
