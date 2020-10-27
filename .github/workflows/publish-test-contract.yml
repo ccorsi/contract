@@ -30,3 +30,11 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
         twine upload --repository testpypi dist/*
+    - name: Test Published Package
+      run: |
+        python -m venv testenv
+        source testenv/bin/activate
+        python -m pip install --upgrade pip
+        pip install -i https://test.pypi.org/simple/ contract-decorator
+        cd tests
+        python main.py
