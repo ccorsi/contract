@@ -4,7 +4,10 @@
 name: Upload Contract Package to PyPi
 
 on:
-  create:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
     tags:
       - 'v*'
 
