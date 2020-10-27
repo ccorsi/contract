@@ -140,3 +140,74 @@ The above example will insure that the value of parameter *a* will be set to 'bl
 The above check will determine that the return value is greater than 100.  Note
 that you need to specify that the return parameter name as *None*.  This is how we 
 associate the check for the return value.
+
+### User Defined Checks
+
+The contract decorator provides the ability for a user to create their own user defined
+checks.  This will allow users to define checks that are not covered above.  There are
+two different ways of creating user-defined checks.  You can create a class that has 
+a callable defined that expects a single parameter or you can define a method that
+expects a single parameter.  Both implementations will be passed the value that was 
+passed to the decorated method.  The following section will give examples of each.
+
+#### User Defined Class Check
+
+Here is a simple example of how to create and use a user define class to check
+that the passed method parameter value agrees with the method contract.
+
+```python
+
+class UserDefinedCheck(object):
+    def __init__(self,cond):
+        self.cond_ = cond
+        ...
+
+    def __call__(self, v):
+        # Example of using a simple assert check
+        assert v != None, "The value passed cannot be None"
+        # Example of using a simple method or instance object.
+        # The method or instance should raise an AssertionError whenever the condition is false
+        cond(v) 
+        ...
+
+@contract({'a':[UserDefinedCheck()]})
+def check_me(a,b):
+    ...
+
+```
+
+The *UserDefinedCheck* class that was created above has a distinctive requirement.  
+The need for the class to implement the *\_\_call\_\_* method with a single
+parameter.  The callable method is called by the contract decorator and it expects
+the call to raise an AssertionError whenever the condition is not valid.  Lastly,
+the class is used by passing an instance of the *UserDefinedCheck* class to the 
+contract decorator.
+
+In the example above, the parameter passed will be the value of the *a* parameter
+when the *check\_me* function is called.
+  
+#### User Defined Method Check
+
+Here is a simple example showing how a user-defined check method can be implemented 
+and used by the contract decorator.
+
+```python
+
+def user_defined_check(v):
+    assert v != None, 'The value cannot be set to None'
+    ...
+
+@contract({'b':[user_defined_check]})
+def check_me(a,b):
+    ...
+
+```
+
+The *user\_defined\_check* method was created with a similar requirement as the user 
+defined class.  The method was defined with a simple parameter.  The contract 
+decorator will then pass the value of the checking parameter when the method that
+is being checked is called.  Lastly, a reference to the *user\_defined\_check* method
+is passed to the contract decorator.
+
+In the example above, the check_me method will use the *user\_defined\_check* method
+to check the contract of the *b* parameter. 
