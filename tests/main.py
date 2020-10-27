@@ -6,7 +6,7 @@ and pypi.org.
 
 from contract import contract, checktype
 
-if "__name__" == "__main__":
+if __name__ == "__main__":
     class Simple(object):
         @contract({'a': [checktype(int)]})
         def check_me(self, a):
